@@ -1,3 +1,17 @@
+ALL_RATE_ORACLES = [
+    "binance",
+    "coin_gecko",
+    "coin_cap",
+    "kucoin",
+    "ascend_ex",
+    "gate_io",
+    "coinbase_advanced_trade",
+    "cube",
+    "dexalot",
+    "hyperliquid",
+    "derive",
+    "mexc",
+]
 import asyncio
 import logging
 from decimal import Decimal
@@ -39,6 +53,15 @@ RATE_ORACLE_SOURCES = {
     "mexc": MexcRateSource,
 }
 
+def DefaultRateSource() -> RateSourceBase:
+    import os
+    source_name = os.environ.get("MY_RATE_ORACLE", "binance").lower()
+    if source_name not in RATE_ORACLE_SOURCES:
+        source_name = "binance"
+
+    source_class = RATE_ORACLE_SOURCES[source_name]
+    return source_class()
+
 
 class RateOracle(NetworkBase):
     """
@@ -50,10 +73,6 @@ class RateOracle(NetworkBase):
     _shared_instance: "RateOracle" = None
 
     @classmethod
-    def get_instance(cls) -> "RateOracle":
-        if cls._shared_instance is None:
-            cls._shared_instance = RateOracle()
-        return cls._shared_instance
 
     @classmethod
     def logger(cls) -> HummingbotLogger:
@@ -63,7 +82,7 @@ class RateOracle(NetworkBase):
 
     def __init__(self, source: Optional[RateSourceBase] = None, quote_token: Optional[str] = None):
         super().__init__()
-        self._source: RateSourceBase = source if source is not None else BinanceRateSource()
+        self._source = source if source is not None else DefaultRateSource()
         self._prices: Dict[str, Decimal] = {}
         self._fetch_price_task: Optional[asyncio.Task] = None
         self._ready_event = asyncio.Event()

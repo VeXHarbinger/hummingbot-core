@@ -1,3 +1,20 @@
+## Environment Variable: RATE_ORACLE_DEFAULT
+
+You can control which rate oracle source is used by default by setting the `RATE_ORACLE_DEFAULT` environment variable. This is especially useful for users in regions where the default (Binance) may not be accessible.
+
+**Usage:**
+
+Set the environment variable before starting Hummingbot (e.g., in your Docker Compose, .env file, or shell):
+
+```
+export RATE_ORACLE_DEFAULT=coin_gecko
+```
+
+Valid values are:
+
+  binance, coin_gecko, coin_cap, kucoin, ascend_ex, gate_io, coinbase_advanced_trade, cube, dexalot, hyperliquid, derive, mexc
+
+If the variable is not set, empty, or invalid, the system will fall back to `binance` as the default.
 ![Hummingbot](https://github.com/user-attachments/assets/3213d7f8-414b-4df8-8c1b-a0cd142a82d8)
 
 ----
@@ -73,6 +90,8 @@ cd hummingbot
    environment:
      - GATEWAY_PASSPHRASE=admin
      - DEV=true
+     # The default Rate Oracle is Binance, but it can be set to any of the source Ids, for example;
+     # - MY_RATE_ORACLE=coin_gecko
 ```
 
 Then run:
